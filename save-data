@@ -1,0 +1,21 @@
+// Ajout d'un menu pour executer manuellement la fonction en cas d'oubli d'ajout des données de revenus
+function onOpen() {
+  var ui = SpreadsheetApp.getUi();
+  ui.createMenu('Custom Menu')
+      .addItem('Save Data','appendToRecords')
+      .addToUi();
+}
+
+//Fonction pour sauvegarder le contenu de "Datablending" dans "Database".
+function appendToRecords() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var reportSheet = ss.getSheetByName("Datablending");
+  var recordsSheet = ss.getSheetByName("Database")
+  var reportData = reportSheet.getRange("A2:U8").getValues();
+                              
+  var lastRow = recordsSheet.getLastRow();
+  //copy data
+  recordsSheet.getRange(lastRow + 1, 1, 7, 21)
+              .setValues(reportData);
+
+}
