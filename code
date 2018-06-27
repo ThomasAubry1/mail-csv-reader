@@ -1,0 +1,47 @@
+# mail-csv-reader
+
+// La fonction cherche le dernier courriel du destinataire dans la boite de reception, trouve le CSV et le dé-zip, puis l'ajoute dans Google Sheets. 
+function getCSV() {
+  var threads = GmailApp.search("from:adctr@microsoft.com");
+  var msgs = GmailApp.getMessagesForThreads(threads);
+  var attachments = msgs[0][0].getAttachments();
+
+
+  var csv =  attachments[0];
+  var extracted = Utilities.unzip(csv);
+  var string = extracted[0].getDataAsString();
+  var data = Utilities.parseCsv(string);
+
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Sheet1");
+  sheet.clearContents();
+  var range = sheet.getRange(1,1, data.length,data[0].length);
+  range.setValues(data);
+    
+}
+
+// Pour cette partie j'ai repris une partie du script utilisé pour Facebook
+function uploadData() {
+  var accountId = "XXXXXXXX";
+  var webPropertyId = "UA-XXXXXXXX-X";
+  var customDataSourceId = "240MdGK3QOqjR2fJyGoFHw";
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName("Sheet2");
+  var maxRows = sheet.getLastRow();
+  var maxColumns = sheet.getLastColumn();
+  var data = [];
+  for (var i = 1; i <= maxRows;i++) {
+    data.push(sheet.getRange([i], 1,1, maxColumns).getValues());
+  }
+  var newData = data.join("\n");
+  var blobData = Utilities.newBlob(newData, "application/octet-stream", "GA import data");
+  Logger.log(blobData.getDataAsString())
+  try {
+    var upload = Analytics.Management.Uploads.uploadData(accountId, webPropertyId, customDataSourceId, blobData);
+    SpreadsheetApp.getUi().alert("Uploading: OK");
+  }
+  catch(err) {
+    SpreadsheetApp.getUi().alert(err);
+  }
+}
