@@ -1,6 +1,6 @@
 # mail-csv-reader
 
-// La fonction cherche le dernier courriel du destinataire dans la boite de reception, trouve le CSV et le dé-zip, puis l'ajoute dans Google Sheets. 
+// La fonction cherche le dernier courriel de Bing dans la boite de reception, trouve le CSV et le dé-zip, puis l'ajoute dans Google Sheets. 
 function getCSV() {
   var threads = GmailApp.search("from:adctr@microsoft.com");
   var msgs = GmailApp.getMessagesForThreads(threads);
